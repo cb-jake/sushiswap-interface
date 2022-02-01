@@ -21,6 +21,7 @@ import { useAllTokens } from 'app/hooks/Tokens'
 import { useActiveWeb3React } from 'app/services/web3'
 import { AppState } from 'app/state'
 import { useAppDispatch, useAppSelector } from 'app/state/hooks'
+import { updateSlippage } from 'app/state/slippage/slippageSlice'
 import flatMap from 'lodash/flatMap'
 import { useCallback, useMemo } from 'react'
 import ReactGA from 'react-ga'
@@ -36,7 +37,6 @@ import {
   updateUserDeadline,
   updateUserExpertMode,
   updateUserSingleHopOnly,
-  updateUserSlippageTolerance,
   updateUserUseOpenMev,
 } from './actions'
 
@@ -94,7 +94,7 @@ export function useUserSingleHopOnly(): [boolean, (newSingleHopOnly: boolean) =>
   return [singleHopOnly, setSingleHopOnly]
 }
 
-export function useSetUserSlippageTolerance(): (slippageTolerance: Percent | 'auto') => void {
+export function useSetUserSlippageTolerance(): (slippageTolerance: Percent) => void {
   const dispatch = useAppDispatch()
 
   return useCallback(
@@ -106,11 +106,7 @@ export function useSetUserSlippageTolerance(): (slippageTolerance: Percent | 'au
       } catch (error) {
         value = 'auto'
       }
-      dispatch(
-        updateUserSlippageTolerance({
-          userSlippageTolerance: value,
-        })
-      )
+      dispatch(updateSlippage(value))
     },
     [dispatch]
   )
@@ -121,7 +117,7 @@ export function useSetUserSlippageTolerance(): (slippageTolerance: Percent | 'au
  */
 export function useUserSlippageTolerance(): Percent | 'auto' {
   const userSlippageTolerance = useAppSelector((state) => {
-    return state.user.userSlippageTolerance
+    return state.slippage
   })
 
   return useMemo(

@@ -10,6 +10,8 @@ import React, { FC, useState } from 'react'
 import Button from '../Button'
 import QuestionHelper from '../QuestionHelper'
 import Typography from '../Typography'
+import { useAppDispatch } from 'app/state/hooks'
+import { updateSlippage } from 'app/state/slippage/slippageSlice'
 
 enum SlippageError {
   InvalidInput = 'InvalidInput',
@@ -28,9 +30,9 @@ export interface TransactionSettingsProps {
 
 const TransactionSettings: FC<TransactionSettingsProps> = ({ placeholderSlippage, trident = false }) => {
   const { i18n } = useLingui()
+  const dispatch = useAppDispatch()
 
   const userSlippageTolerance = useUserSlippageTolerance()
-  const setUserSlippageTolerance = useSetUserSlippageTolerance()
 
   const [deadline, setDeadline] = useUserTransactionTTL()
 
@@ -46,7 +48,7 @@ const TransactionSettings: FC<TransactionSettingsProps> = ({ placeholderSlippage
     setSlippageError(false)
 
     if (value.length === 0) {
-      setUserSlippageTolerance('auto')
+      dispatch(updateSlippage(value))
     } else {
       const parsed = Math.floor(Number.parseFloat(value) * 100)
 
